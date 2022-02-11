@@ -1,0 +1,46 @@
+<form [formGroup]="form">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <button mat-raised-button color="primary" (click)="saveRecords()">Save</button>
+            </div>
+        </div>
+        <div formArrayName="contacts">
+            <div class="row" [formGroupName]="i"
+                *ngFor="let element of dummyContacts; let first = first; let i = index">
+                <!-- <div *ngIf="!first">----------</div> -->
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Phone</th>
+                            <th>Name</th>
+                            <th>Primary User</th>
+                            <th>Secondary User</th>
+                        </tr>
+                    </thead>
+                    <tr>
+                        <td>{{this.dummyContacts[i].phoneNo}}</td>
+                        <td>{{this.dummyContacts[i].name}}</td>
+
+                        <td></td>
+                        <td>
+                            <span formArrayName="contactUsers">
+                                <ng-container [formGroupName]="j"
+                                    *ngFor="let qtys of dummyContacts[i].contactUsers; let j = index">
+
+                                    <input matInput type="text"
+                                        value=" {{this.dummyContacts[i].contactUsers[j].userId}}">
+                                    <button (click)=remove(i,j)></button>
+                                </ng-container>
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+                <!-- <mat-form-field class="">
+                    <input matInput type="text" value="{{this.dummyContacts[i].name}}" readonly>
+                    <input matInput type="text" value="{{this.dummyContacts[i].phoneNo}}" readonly>
+                </mat-form-field> -->
+            </div>
+        </div>
+    </div>
+</form>
