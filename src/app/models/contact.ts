@@ -7,5 +7,7 @@ export class Contact implements IEntity {
     name: string = "";
     phoneNo: string = "";
     contactUsers: ContactUser[] = [];
+    primaryUserName:string="";
+    primaryUserId:number=0;
 
 }

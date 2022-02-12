@@ -6,5 +6,6 @@ export class ContactUser implements IEntity {
     contactId: number = 0;
     userId: number = 0;
     userType: number = 0;
+    userName: string = "";
 
 }

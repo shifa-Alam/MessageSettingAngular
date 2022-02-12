@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Contact } from 'src/app/models/contact';
+import { ContactUser } from 'src/app/models/contactUser';
+import { User } from 'src/app/models/user';
 import { ContactService } from 'src/app/services/contact.service';
+import { TestService } from 'src/app/services/test.service';
 
 @Component({
   selector: 'app-test',
@@ -15,9 +18,11 @@ export class TestComponent implements OnInit {
   });
 
   dummyContacts: Contact[] = [];
+  users: User[] = [];
 
-  constructor(private fb: FormBuilder, private contactService: ContactService) {
-    this.dummyContacts = contactService.getDummyData();
+  constructor(private fb: FormBuilder, private testService: TestService) {
+    this.dummyContacts = testService.getDummyData();
+    this.users = testService.getDummyUser();
     this.initializRecords();
   }
 
@@ -25,12 +30,16 @@ export class TestComponent implements OnInit {
     return this.form.controls["contacts"] as FormArray;
   }
 
+
+
   initializRecords(data?: any) {
 
     for (var i = 0; i < this.dummyContacts.length; i++) {
       this.contacts.push(new FormGroup({
         phoneNo: new FormControl(this.dummyContacts[i].phoneNo),
         name: new FormControl(this.dummyContacts[i].name),
+        primaryUserId: new FormControl(this.dummyContacts[i].primaryUserId),
+        // name: new FormControl(this.dummyContacts[i].name),
         contactUsers: new FormArray([])
       }))
 
@@ -57,9 +66,30 @@ export class TestComponent implements OnInit {
 
   remove(i: number, j: number) {
 
-
-
     this.dummyContacts[i].contactUsers.splice(j, 1);
+
+  }
+
+  add(i: number) {
+
+    let cu = new ContactUser();
+    cu.userId = 90;
+    cu.userType = 2;
+    this.dummyContacts[i].contactUsers.push(cu);
+
+  }
+
+  AddSecondaryUser(user: User, i: number) {
+    console.log(user);
+
+    let cu = new ContactUser();
+    cu.userId = user.id;
+    cu.userName=user.name;
+    cu.userType = 2;
+    if(cu.userId>0)
+    this.dummyContacts[i].contactUsers.push(cu);
+
+    console.log(this.dummyContacts[i].contactUsers);
 
   }
 
