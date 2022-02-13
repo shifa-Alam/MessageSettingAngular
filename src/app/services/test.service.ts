@@ -5,11 +5,16 @@ import { IEntity } from '../interfaces/ientity';
 import { Contact } from '../models/contact';
 import { ContactUser } from '../models/contactUser';
 import { User } from '../models/user';
+import { BaseService } from './base.service';
+
+const subUrl: string = 'api/contact/';
+
 
 @Injectable({
   providedIn: 'root'
 })
-export class TestService {
+export class TestService extends BaseService {
+  static ngInjectableDef = undefined;
   contacts: Contact[] = [];
   users: User[] = [];
 
@@ -23,14 +28,14 @@ export class TestService {
       contact.id = i;
       contact.name = "Shifa " + i;
       contact.phoneNo = "990 " + i;
-      contact.primaryUserId=2;
+      contact.primaryUserId = 2;
 
-      for (let index = 1; index <3; index++) {
+      for (let index = 1; index < 3; index++) {
         const element: ContactUser = new ContactUser();
         element.contactId = i;
         element.userId = index;
         element.userType = 2
-        element.userName="test "+i;
+        element.userName = "test " + i;
         contact.contactUsers.push(element);
 
       }
@@ -50,27 +55,34 @@ export class TestService {
     }
     return this.users;
   }
-  private url = 'https://localhost:7159/api/contact/SaveAsync';
 
-  constructor(private http: HttpClient) {
+  // constructor(private http: HttpClient) {
 
+  // }
+  // saveContactAsync(entity: IEntity): Observable<any> {
+  //   console.log(entity);
+  //   return this.http.post<any>(`${this.subUrl}`, (entity),
+  //     {
+  //       // headers: {
+  //       //   "Content-Type": "application/json;charset=UTF-8",
+  //       // },
+  //       reportProgress: true,
+  //       observe: 'events'
+  //     })
+  //     .pipe(
+  //       tap(() => {
+  //         // this._refreshNeeded$.next();
+  //       }),
+
+  //       // catchError(this.handleError)
+  //     );
+  // }
+
+  saveAsync(entity: IEntity): Observable<any> {
+    return super.post(subUrl + "SaveAsync", entity);
   }
-  saveContactAsync(entity: IEntity): Observable<any> {
-    console.log(entity);
-    return this.http.post<any>(`${this.url}`, (entity),
-      {
-        // headers: {
-        //   "Content-Type": "application/json;charset=UTF-8",
-        // },
-        reportProgress: true,
-        observe: 'events'
-      })
-      .pipe(
-        tap(() => {
-          // this._refreshNeeded$.next();
-        }),
 
-        // catchError(this.handleError)
-      );
+  getContactAsync(): Observable<any> {
+    return super.get("GetContactAsync");
   }
 }

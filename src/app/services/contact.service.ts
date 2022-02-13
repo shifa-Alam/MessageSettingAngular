@@ -1,37 +1,25 @@
 import { Injectable } from '@angular/core';
 import { Observable, tap } from 'rxjs';
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { IEntity } from '../interfaces/ientity';
-import { Contact } from '../models/contact';
-import { ContactUser } from '../models/contactUser';
-import { User } from '../models/user';
+import { BaseService } from './base.service';
+
+const subUrl: string = 'api/contact/';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ContactService {
- 
-  private url = 'https://localhost:7159/api/contact/SaveAsync';
+export class ContactService extends BaseService {
 
-  constructor(private http: HttpClient) {
 
+  updateRangeAsync(entities: IEntity[]): Observable<any> {
+    return super.post(subUrl + "UpdateRangeAsync", entities);
   }
-  saveContactAsync(entity: IEntity): Observable<any> {
-    console.log(entity);
-    return this.http.post<any>(`${this.url}`, (entity),
-      {
-        // headers: {
-        //   "Content-Type": "application/json;charset=UTF-8",
-        // },
-        reportProgress: true,
-        observe: 'events'
-      })
-      .pipe(
-        tap(() => {
-          // this._refreshNeeded$.next();
-        }),
 
-        // catchError(this.handleError)
-      );
+  getContactAsync(): Observable<any> {
+    return super.get(subUrl+"GetContactAsync");
+  }
+
+  getUserAsync(): Observable<any> {
+    return super.get(subUrl+"GetUserAsync");
   }
 }

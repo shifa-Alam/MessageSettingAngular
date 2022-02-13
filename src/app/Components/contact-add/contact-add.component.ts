@@ -1,7 +1,10 @@
 import { HttpEventType } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { Subject, takeUntil } from 'rxjs';
 import { Contact } from 'src/app/models/contact';
 import { ContactUser } from 'src/app/models/contactUser';
+import { User } from 'src/app/models/user';
 import { ContactService } from 'src/app/services/contact.service';
 
 @Component({
@@ -10,40 +13,128 @@ import { ContactService } from 'src/app/services/contact.service';
   styleUrls: ['./contact-add.component.scss']
 })
 export class ContactAddComponent implements OnInit {
- 
+  private unsubscribe$ = new Subject<void>();
+  form: FormGroup = this.fb.group({
+    contacts: this.fb.array([])
+  });
 
-  contact:Contact = new Contact();
-  // contactUser = new ContactUser();
-  constructor(private contactService: ContactService,) { }
+  dummyContacts: Contact[] = [];
+  users: User[] = [];
 
-  ngOnInit(): void {
-    this.contact.name = "Zahid";
-    this.contact.phoneNo="990";
-
-    for (let index = 1; index <= 2; index++) {
-      const element = new ContactUser();
-      element.userId=2;
-      element.userType=index
-      this.contact.contactUsers.push(element);
-    }
- 
-    this.onSave();
+  constructor(private fb: FormBuilder,
+    private testService: ContactService) {
   }
 
-  onSave() {
-    console.log(this.contact);
-    this.contactService.saveContactAsync(this.contact).subscribe((event) => {
-      if (event.type === HttpEventType.Response) {
-        // this._snackBarService.success("Saved Successfully!");
-        // this.isLoading = false;
-        // this.router.navigate(['']);
+  get contacts(): FormArray {
+    return this.form.controls["contacts"] as FormArray;
+  }
+  ngOnInit(): void {
+    this.loadUsers();
+    this.loadContacts();
+  }
+
+
+  initializRecords(data?: any) {
+
+    for (var i = 0; i < this.dummyContacts.length; i++) {
+      this.contacts.push(new FormGroup({
+        phoneNo: new FormControl(this.dummyContacts[i].phoneNo),
+        name: new FormControl(this.dummyContacts[i].name),
+        primaryUserId: new FormControl(this.dummyContacts[i].primaryUserId),
+        // name: new FormControl(this.dummyContacts[i].name),
+        contactUsers: new FormArray([])
+      }))
+
+
+      let contactUsers = <FormArray>(<FormArray>this.form.get('contacts')).controls[i].get('contactUsers')
+      for (var j = 0; j < this.dummyContacts[0].contactUsers.length; j++) {
+        contactUsers.push(new FormGroup({
+          userId: new FormControl(this.dummyContacts[i].contactUsers[j].userId)
+        }))
       }
-    },
-      error => {
-        // this._snackBarService.error("Something Wrong");
-        // this.isLoading = false;
-      }
-    );
+    }
+    console.log(this.form.value)
+  }
+
+  saveRecords() {
+
+
+    console.log(this.dummyContacts);
+
+  }
+
+  remove(i: number, j: number) {
+
+    this.dummyContacts[i].contactUsers.splice(j, 1);
+
+  }
+
+  add(i: number) {
+
+    let cu = new ContactUser();
+    cu.userId = 90;
+    cu.userType = 2;
+    this.dummyContacts[i].contactUsers.push(cu);
+
+  }
+
+  AddSecondaryUser(user: User, i: number) {
+    console.log(user);
+
+    let cu = new ContactUser();
+    cu.userId = user.id;
+    cu.userName = user.name;
+    cu.userType = 2;
+    if (cu.userId > 0)
+      this.dummyContacts[i].contactUsers.push(cu);
+
+    console.log(this.dummyContacts[i].contactUsers);
+
+  }
+
+
+
+
+
+
+
+
+  loadContacts() {
+    this.testService.getContactAsync()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(event => {
+        if (event.type === HttpEventType.Response) {
+          this.dummyContacts = event.body;
+          console.log(event.body);
+        }
+      }, () => {
+        this.dummyContacts = [];
+      });
+  }
+  loadUsers() {
+    this.testService.getUserAsync()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(event => {
+        if (event.type === HttpEventType.Response) {
+
+          console.log(event.body);
+          this.users = event.body;
+        }
+      }, () => {
+        this.users = [];
+      });
+  }
+
+  updaterange() {
+    this.testService.updateRangeAsync(this.dummyContacts)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(e => {
+        if (e.type === HttpEventType.Response) {
+          this.dummyContacts = e.body;
+        }
+      },
+        error => {
+        });
   }
 
 }
