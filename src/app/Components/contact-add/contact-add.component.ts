@@ -18,14 +18,12 @@ export class ContactAddComponent implements OnInit {
   users: User[] = [];
 
   constructor(private contactService: ContactService) {
+
+  }
+  ngOnInit() {
     this.loadUsers();
     this.loadContacts();
   }
-
-  ngOnInit() {
-
-  }
-
 
   loadContacts() {
     this.contactService.getContactAsync()
@@ -33,14 +31,7 @@ export class ContactAddComponent implements OnInit {
       .subscribe(event => {
         if (event.type === HttpEventType.Response) {
           this.contacts = event.body;
-          this.contacts.forEach(e => {
-            e.contactUsers.forEach(element => {
-              if (element.userType == 1) {
-                e.primaryUserId = element.userId;
-                e.primaryUserName = element.userName
-              }
-            });
-          });
+          this.modifyPrimaryUser();
         }
       }, () => {
         this.contacts = [];
@@ -58,14 +49,7 @@ export class ContactAddComponent implements OnInit {
       });
   }
 
-  removeSecondaryUser(i: number, j: number) {
-
-    this.contacts[i].contactUsers.splice(j, 1);
-
-  }
-
-
-  updaterange() {
+  updateRange() {
     this.contactService.updateRangeAsync(this.contacts)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(e => {
@@ -76,7 +60,6 @@ export class ContactAddComponent implements OnInit {
         error => {
         });
   }
-
 
   AddSecondaryUser(user: User, i: number) {
     console.log(user);
@@ -91,6 +74,13 @@ export class ContactAddComponent implements OnInit {
     console.log(this.contacts[i].contactUsers);
 
   }
+  removeSecondaryUser(i: number, j: number) {
+
+    this.contacts[i].contactUsers.splice(j, 1);
+
+  }
+
+
 
   changePrimaryUser(userId: number, i: number) {
     if (userId) {
@@ -108,5 +98,15 @@ export class ContactAddComponent implements OnInit {
       if (primaryUser)
         this.contacts[i].contactUsers.splice(this.contacts[i].contactUsers.indexOf(primaryUser), 1);
     }
+  }
+  modifyPrimaryUser() {
+    this.contacts.forEach(e => {
+      e.contactUsers.forEach(element => {
+        if (element.userType == 1) {
+          e.primaryUserId = element.userId;
+          e.primaryUserName = element.userName
+        }
+      });
+    });
   }
 }

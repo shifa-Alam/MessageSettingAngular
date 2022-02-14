@@ -16,7 +16,7 @@
                 </svg>
                 Sync contact
             </button>
-            <button type="button" class="theme-button font-11" (click)="updaterange()">Add</button>
+            <button type="button" class="theme-button font-11" (click)="updateRange()">Add</button>
         </div>
     </div>
 </div>
@@ -64,11 +64,7 @@
                     </mat-select>
 
                     <div *ngFor="let contactUser of contact.contactUsers; let j = index" class="user_search-input"
-                        style="flex: .4;">
-                        <!-- <input type="text" name="contactSearch" id="contactSearch" placeholder="Search user"
-                                style="width: 100%;"> -->
-
-
+                        style="flex: .4;">                    
                         <div *ngIf="contactUser.userType==2"
                             class="secondary-user-contact flex-display align-center gap-5">
                             <div
@@ -103,11 +99,11 @@
                                 </button>
 
                             </div>
-                            <!-- <div *ngIf="j>0" class="secondary-user-contact-item"
+                            <div *ngIf="j>1" class="secondary-user-contact-item"
                                 style="width: auto; padding: 4px 6px 5px 6px;">
                                 <span class="font-9 weight-500">{{contacts[i].contactUsers.length-1}}
                                     +</span>
-                            </div> -->
+                            </div>
 
                         </div>
 
