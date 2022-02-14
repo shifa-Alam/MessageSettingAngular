@@ -41,7 +41,7 @@ export class ContactAddComponent implements OnInit {
         phoneNo: new FormControl(this.dummyContacts[i].phoneNo),
         name: new FormControl(this.dummyContacts[i].name),
         primaryUserId: new FormControl(this.dummyContacts[i].primaryUserId),
-        // name: new FormControl(this.dummyContacts[i].name),
+        primaryUserName: new FormControl(this.dummyContacts[i].primaryUserName),
         contactUsers: new FormArray([])
       }))
 
