@@ -6,8 +6,8 @@ import { TestComponent } from './Components/test/test.component';
 import { EmployeeComponent } from './employee/employee.component';
 
 const routes: Routes = [
-  { path: '', component: RndComponent },
-  // { path: '', component: ContactAddComponent },
+  // { path: '', component: RndComponent },
+  { path: '', component: ContactAddComponent },
   // { path: 'contact', component: ContactAddComponent, pathMatch: 'full' },
   // { path: 'employee', component: EmployeeComponent, pathMatch: 'full' }
 ];

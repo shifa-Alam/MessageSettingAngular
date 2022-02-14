@@ -14,69 +14,69 @@ import { ContactService } from 'src/app/services/contact.service';
 })
 export class ContactAddComponent implements OnInit {
   private unsubscribe$ = new Subject<void>();
-  form: FormGroup = this.fb.group({
-    contacts: this.fb.array([])
-  });
-
-  dummyContacts: Contact[] = [];
+  contacts: Contact[] = [];
   users: User[] = [];
 
-  constructor(private fb: FormBuilder,
-    private testService: ContactService) {
-  }
-
-  get contacts(): FormArray {
-    return this.form.controls["contacts"] as FormArray;
-  }
-  ngOnInit(): void {
+  constructor(private contactService: ContactService) {
     this.loadUsers();
     this.loadContacts();
   }
 
-
-  initializRecords(data?: any) {
-
-    for (var i = 0; i < this.dummyContacts.length; i++) {
-      this.contacts.push(new FormGroup({
-        phoneNo: new FormControl(this.dummyContacts[i].phoneNo),
-        name: new FormControl(this.dummyContacts[i].name),
-        primaryUserId: new FormControl(this.dummyContacts[i].primaryUserId),
-        primaryUserName: new FormControl(this.dummyContacts[i].primaryUserName),
-        contactUsers: new FormArray([])
-      }))
-
-
-      let contactUsers = <FormArray>(<FormArray>this.form.get('contacts')).controls[i].get('contactUsers')
-      for (var j = 0; j < this.dummyContacts[0].contactUsers.length; j++) {
-        contactUsers.push(new FormGroup({
-          userId: new FormControl(this.dummyContacts[i].contactUsers[j].userId)
-        }))
-      }
-    }
-    console.log(this.form.value)
-  }
-
-  saveRecords() {
-
-
-    console.log(this.dummyContacts);
+  ngOnInit() {
 
   }
 
-  remove(i: number, j: number) {
 
-    this.dummyContacts[i].contactUsers.splice(j, 1);
+  loadContacts() {
+    this.contactService.getContactAsync()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(event => {
+        if (event.type === HttpEventType.Response) {
+          this.contacts = event.body;
+          this.contacts.forEach(e => {
+            e.contactUsers.forEach(element => {
+              if (element.userType == 1) {
+                e.primaryUserId = element.userId;
+                e.primaryUserName = element.userName
+              }
+            });
+          });
+        }
+      }, () => {
+        this.contacts = [];
+      });
+  }
+  loadUsers() {
+    this.contactService.getUserAsync()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(event => {
+        if (event.type === HttpEventType.Response) {
+          this.users = event.body;
+        }
+      }, () => {
+        this.users = [];
+      });
+  }
+
+  removeSecondaryUser(i: number, j: number) {
+
+    this.contacts[i].contactUsers.splice(j, 1);
 
   }
 
-  add(i: number) {
 
-    let cu = new ContactUser();
-    cu.userId = 90;
-    cu.userType = 2;
-    this.dummyContacts[i].contactUsers.push(cu);
-
+  updaterange() {
+    this.contactService.updateRangeAsync(this.contacts)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(e => {
+        if (e.type === HttpEventType.Response) {
+          // this.dummyContacts = e.body;
+        }
+      },
+        error => {
+        });
   }
+
 
   AddSecondaryUser(user: User, i: number) {
     console.log(user);
@@ -86,55 +86,27 @@ export class ContactAddComponent implements OnInit {
     cu.userName = user.name;
     cu.userType = 2;
     if (cu.userId > 0)
-      this.dummyContacts[i].contactUsers.push(cu);
+      this.contacts[i].contactUsers.push(cu);
 
-    console.log(this.dummyContacts[i].contactUsers);
+    console.log(this.contacts[i].contactUsers);
 
   }
 
-
-
-
-
-
-
-
-  loadContacts() {
-    this.testService.getContactAsync()
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(event => {
-        if (event.type === HttpEventType.Response) {
-          this.dummyContacts = event.body;
-          console.log(event.body);
-        }
-      }, () => {
-        this.dummyContacts = [];
-      });
+  changePrimaryUser(userId: number, i: number) {
+    if (userId) {
+      var primaryUser = this.contacts[i].contactUsers.find(e => e.userType = 1);
+      if (primaryUser) {
+        primaryUser.userId = userId;
+      } else {
+        let cu = new ContactUser();
+        cu.userId = userId;
+        cu.userType = 1;
+        this.contacts[i].contactUsers.push(cu);
+      }
+    } else {
+      var primaryUser = this.contacts[i].contactUsers.find(e => e.userType = 1);
+      if (primaryUser)
+        this.contacts[i].contactUsers.splice(this.contacts[i].contactUsers.indexOf(primaryUser), 1);
+    }
   }
-  loadUsers() {
-    this.testService.getUserAsync()
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(event => {
-        if (event.type === HttpEventType.Response) {
-
-          console.log(event.body);
-          this.users = event.body;
-        }
-      }, () => {
-        this.users = [];
-      });
-  }
-
-  updaterange() {
-    this.testService.updateRangeAsync(this.dummyContacts)
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(e => {
-        if (e.type === HttpEventType.Response) {
-          this.dummyContacts = e.body;
-        }
-      },
-        error => {
-        });
-  }
-
 }

@@ -1,66 +1,185 @@
-<form [formGroup]="form">
-         <div formArrayName="contacts">
-                  <div *ngFor="let X of contactsArray.controls; let ix=index">
-                           <div [formGroupName]="ix" class="Xs">
-                                    <input type="text" formControlName="phoneNo">
-                                    <!-- <p>{{ formErrors?.Xs[ix].X }}</p> -->
-                                    <div formArrayName="contactUsers">
+<!-- 
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <button mat-raised-button color="primary" (click)="saveRecords()">Save</button>
+            </div>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Phone</th>
+                    <th>Name</th>
+                    <th>Primary User</th>
+                    <th>Secondary User</th>
+                </tr>
+            </thead>
+            <tbody 
+            *ngFor="let element of contacts; let first = first; let i = index">
+                <tr>
+                    <td>{{this.contacts[i].phoneNo}}</td>
+                    <td>{{this.contacts[i].name}}</td>
 
-                                             <div *ngFor="let Y of getYsArray(ix).controls; let iy=index">
-                                                      <div [formGroupName]="iy" class="Ys">
-                                                               <select formControlName="product"
-                                                                        (change)="productSelected($event)">
-                                                                        <option *ngFor="let product of products"
-                                                                                 [attr.data-product_id]="product.id"
-                                                                                 [value]="product.id">
-                                                                                 {{product.name}}
-                                                                        </option>
-                                                               </select>
-                                                               <div formArrayName="Zs">
-                                                                        <div
-                                                                                 *ngFor="let Z of getZsArray(ix,iy).controls; let iz=index">
-                                                                                 <div [formGroupName]="iz" class="Zs">
-                                                                                          <select formControlName="Z">
-                                                                                                   <option *ngFor="let item of filteredItems"
-                                                                                                            [value]="item.id">
-                                                                                                            {{item.name}}
-                                                                                                   </option>
-                                                                                          </select>
-                                                                                 </div>
-                                                                        </div>
-                  <input type="button" (click)="addZ(ix,iy)" value="Add Z">
-                  </div>
-                  </div>
-                  </div>
-         <input type="button" (click)="addY(ix)" value="Add Y">
-         </div>
-         
-         <div formArrayName="Ws">
-                  <div *ngFor="let W of getWsArray(ix).controls; let iw=index">
-                           <div [formGroupName]="iw" class="Ws">
-                                    <select formControlName="state" (change)="stateSelected($event)">
-                                             <option *ngFor="let state of states" [attr.data-state_id]="state.id"
-                                                      [value]="state.id">
-                                                      {{state.name}}
-                                             </option>
-                                    </select>
-                                    <select formControlName="city">
-                                             <option *ngFor="let city of filteredCities" [value]="city.name">
-                                                      {{city.name | titlecase}}
-                                             </option>
-                                    </select>
-                                    <input type="button" (click)="removeW(ix,iw)" value="Remove W">
-                           </div>
-                  </div>
-                  <input type="button" (click)="addW(ix)" value="Add W">
-         </div>
-         </div>
-         </div>
-         <input type="button" (click)="addX()" value="Add X">
-         </div>
-         <form>
-                  -->
-                  <h5>Field Values</h5>
-                  <pre style="font-size:15px">
-                      {{ form.value | json }}
-                      </pre>
+                    <td>
+
+
+                        <mat-select [(ngModel)]="this.contacts[i].primaryUserId"
+                            [ngModelOptions]="{standalone: true}">
+                            <mat-option value="0">none</mat-option>
+                            <mat-option *ngFor="let user of users" [value]="user.id">
+                                {{user.name}}
+                            </mat-option>
+                        </mat-select>
+
+                    </td>
+                    <td>
+                        <div>
+                            <span>
+                              
+                                <mat-select>
+                                    <mat-option value="">none</mat-option>
+                                    <mat-option *ngFor="let user of users" [value]="user.id">
+                                        {{user.name}}
+                                    </mat-option>
+                                </mat-select>
+
+                                <ng-container 
+                                    *ngFor="let qtys of contacts[i].contactUsers; let j = index">
+                                    <span>{{this.contacts[i].contactUsers[j].userId}}</span>
+                                    <button (click)=remove(i,j)>x</button>
+                                </ng-container>
+
+                            </span>
+                        </div>
+
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+       
+    </div>
+ -->
+
+
+
+
+
+
+<div class="autoreply-subhead-content flex-display column-direction">
+    <span class="text-light font-11">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
+        eirmod
+        tempor invidunt ut labore.</span>
+    <div class="flex-display justify-space-between align-center gap-10 mt-3">
+        <div class="search-input" style="flex: .4;">
+            <input type="text" name="contactSearch" id="contactSearch" placeholder="Search by phone number"
+                style="width: 100%;">
+        </div>
+        <div class="right flex-display align-center gap-10">
+            <button (click)="loadContacts()" type="button" class="sync-button font-11 flex-display align-center gap-10">
+                <svg xmlns="http://www.w3.org/2000/svg" width="10.002" height="13.71" viewBox="0 0 10.002 13.71">
+                    <path id="Icon_ionic-md-sync" data-name="Icon ionic-md-sync"
+                        d="M11.751,4.12V2.25L9.25,4.743l2.5,2.493V5.366A3.756,3.756,0,0,1,15.5,9.1a3.7,3.7,0,0,1-.438,1.745l.907.9A4.874,4.874,0,0,0,16.752,9.1,5.008,5.008,0,0,0,11.751,4.12Zm0,8.725A3.756,3.756,0,0,1,8,9.1,3.705,3.705,0,0,1,8.438,7.36l-.906-.9A4.8,4.8,0,0,0,6.75,9.1a5.008,5.008,0,0,0,5,4.985v1.87l2.5-2.493-2.5-2.493Z"
+                        transform="translate(-6.75 -2.25)" fill="#4da0a5" />
+                </svg>
+                Sync contact
+            </button>
+            <button type="button" class="theme-button font-11" (click)="updaterange()">Add</button>
+        </div>
+    </div>
+</div>
+
+<div class="tableFixHead messanger-contact-table mt-3" style="height: calc(100vh - 325px);">
+
+        <table class="short-message-tag-table" >
+            <thead>
+                <tr class="font-11">
+                    <th>Phone Number</th>
+                    <th>Name</th>
+                    <th>Primary user</th>
+                    <th style="width: 50% !important; text-align: left;">Secondary user</th>
+                </tr>
+            </thead>
+            <tbody  *ngFor="let element of contacts;  let i = index">
+                <tr class="font-11">
+                    <td>{{this.contacts[i].phoneNo}}</td>
+                    <td>
+                        <div class="user_search-input">
+                            <input [(ngModel)]="this.contacts[i].name"type="text" name="contactSearch" id="contactSearch" placeholder="Search user" style="width: 100%;">
+                        </div>
+                        </td>
+                    <td>
+                        <div class="primary-user-contact flex-display align-center justify-space-between">
+
+                            <mat-select [(ngModel)]="this.contacts[i].primaryUserId" (valueChange)="changePrimaryUser($event,i)">
+                                <mat-option value="">none</mat-option>
+                                <mat-option *ngFor="let user of users" [value]="user.id">
+                                    {{user.name}}
+                                </mat-option>
+                            </mat-select>
+                        </div>
+                    </td>
+                    <td style="width: 50% !important; text-align: left;">
+                        <mat-select (valueChange)="AddSecondaryUser($event,i)">
+                            <mat-option value="">none</mat-option>
+                            <mat-option *ngFor="let user of users" [value]="user">
+                                {{user.name}}
+                            </mat-option>
+                        </mat-select>
+                        
+                        <div  *ngFor="let contactUser of contacts[i].contactUsers; let j = index" class="user_search-input" style="flex: .4;">
+                            <!-- <input type="text" name="contactSearch" id="contactSearch" placeholder="Search user"
+                                style="width: 100%;"> -->
+
+                          
+                            <div  *ngIf="contactUser.userType!=1"
+                                class="secondary-user-contact flex-display align-center gap-5">
+                                <div *ngIf="j<=1 && contactUser.userType!=1"
+                                    
+                                    class="secondary-user-contact-item flex-display align-center justify-space-between">
+                                    <div   class="contact-name flex-display align-center gap-10">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="17.696" height="17.696"
+                                            viewBox="0 0 17.696 17.696">
+                                            <g id="Group_2684" data-name="Group 2684"
+                                                transform="translate(-765 -345.809)">
+                                                <circle id="_2" data-name="2" cx="8.848" cy="8.848" r="8.848"
+                                                    transform="translate(765 345.809)" fill="rgba(77,160,165,0.1)" />
+                                                <path id="Path_763" data-name="Path 763"
+                                                    d="M12.052,10.331a8.726,8.726,0,0,1-.019-.889A1.74,1.74,0,0,0,12.51,8.41c.121-.01.312-.128.368-.595a.436.436,0,0,0-.163-.436c.2-.593.607-2.428-.757-2.617a1.073,1.073,0,0,0-.967-.371C9.122,4.425,8.9,5.8,9.306,7.379a.437.437,0,0,0-.163.436c.056.467.247.585.368.595A1.736,1.736,0,0,0,10,9.442a8.728,8.728,0,0,1-.019.889c-.37.994-2.865.715-2.981,2.633h8.022C14.907,11.046,12.422,11.325,12.052,10.331Z"
+                                                    transform="translate(762.856 346.155)" fill="#4da0a5" />
+                                            </g>
+                                        </svg>
+                                        <span 
+                                            class="font-9 weight-500">{{contactUser.userName}}</span>
+                                    </div>
+                                    <button (click)=remove(i,j) type="button" class="messanger-body-action-btn cross">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="7.414" height="7.414"
+                                            viewBox="0 0 7.414 7.414">
+                                            <g id="Group_2685" data-name="Group 2685"
+                                                transform="translate(-1191.793 -338.793)">
+                                                <line style="fill: none !important;" id="Line_143" data-name="Line 143"
+                                                    x2="6" y2="6" transform="translate(1192.5 339.5)" fill="none"
+                                                    stroke="#96a0b5" stroke-linecap="round" stroke-width="1" />
+                                                <line style="fill: none !important;" id="Line_144" data-name="Line 144"
+                                                    x1="6" y2="6" transform="translate(1192.5 339.5)" fill="none"
+                                                    stroke="#96a0b5" stroke-linecap="round" stroke-width="1" />
+                                            </g>
+                                        </svg>
+                                    </button>
+
+                                </div>
+                                <div *ngIf="j>1" class="secondary-user-contact-item"
+                                    style="width: auto; padding: 4px 6px 5px 6px;">
+                                    <span class="font-9 weight-500">{{contacts[i].contactUsers.length-1}}
+                                        +</span>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    
+</div>

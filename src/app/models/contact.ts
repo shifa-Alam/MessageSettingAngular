@@ -10,4 +10,6 @@ export class Contact implements IEntity {
     primaryUserName:string="";
     primaryUserId:number=0;
 
+    
+
 }
