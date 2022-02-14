@@ -1,29 +1,66 @@
-<!-- <button (click)="addNewCompany()">Add new Company</button><br><br>
-<form [formGroup]="myForm">
-  <div formArrayName="companies">
-    <div *ngFor="let comp of getControls(); let i=index">
-    <fieldset>
-      <legend><h3>COMPANY {{i+1}}: </h3></legend>
-      <div [formGroupName]="i">
-        <label>Company Name: </label>
-        <input formControlName="company" /><span><button (click)="deleteCompany(i)">Delete Company</button></span>
-        <div formArrayName="projects">
-          <div *ngFor="let project of comp.get('projects').controls; let j=index">
-            <fieldset>
-            <legend><h4>PROJECT {{j+1}}</h4></legend>
-            <div [formGroupName]="j">
-              <label>Project Name:</label>
-              <input formControlName="projectName" /><span><button (click)="deleteProject(comp.controls.projects, j)">Delete Project</button></span>
-            </div>
-            </fieldset>
-          </div>
-          <button (click)="addNewProject(comp.controls.projects)">Add new Project</button>
-        </div>
-      </div>
-    </fieldset>
-    </div>
-  </div><br>
-  
-</form>
+<form [formGroup]="form">
+         <div formArrayName="contacts">
+                  <div *ngFor="let X of contactsArray.controls; let ix=index">
+                           <div [formGroupName]="ix" class="Xs">
+                                    <input type="text" formControlName="phoneNo">
+                                    <!-- <p>{{ formErrors?.Xs[ix].X }}</p> -->
+                                    <div formArrayName="contactUsers">
 
-<pre>{{myForm.value | json}}</pre> -->
+                                             <div *ngFor="let Y of getYsArray(ix).controls; let iy=index">
+                                                      <div [formGroupName]="iy" class="Ys">
+                                                               <select formControlName="product"
+                                                                        (change)="productSelected($event)">
+                                                                        <option *ngFor="let product of products"
+                                                                                 [attr.data-product_id]="product.id"
+                                                                                 [value]="product.id">
+                                                                                 {{product.name}}
+                                                                        </option>
+                                                               </select>
+                                                               <div formArrayName="Zs">
+                                                                        <div
+                                                                                 *ngFor="let Z of getZsArray(ix,iy).controls; let iz=index">
+                                                                                 <div [formGroupName]="iz" class="Zs">
+                                                                                          <select formControlName="Z">
+                                                                                                   <option *ngFor="let item of filteredItems"
+                                                                                                            [value]="item.id">
+                                                                                                            {{item.name}}
+                                                                                                   </option>
+                                                                                          </select>
+                                                                                 </div>
+                                                                        </div>
+                  <input type="button" (click)="addZ(ix,iy)" value="Add Z">
+                  </div>
+                  </div>
+                  </div>
+         <input type="button" (click)="addY(ix)" value="Add Y">
+         </div>
+         
+         <div formArrayName="Ws">
+                  <div *ngFor="let W of getWsArray(ix).controls; let iw=index">
+                           <div [formGroupName]="iw" class="Ws">
+                                    <select formControlName="state" (change)="stateSelected($event)">
+                                             <option *ngFor="let state of states" [attr.data-state_id]="state.id"
+                                                      [value]="state.id">
+                                                      {{state.name}}
+                                             </option>
+                                    </select>
+                                    <select formControlName="city">
+                                             <option *ngFor="let city of filteredCities" [value]="city.name">
+                                                      {{city.name | titlecase}}
+                                             </option>
+                                    </select>
+                                    <input type="button" (click)="removeW(ix,iw)" value="Remove W">
+                           </div>
+                  </div>
+                  <input type="button" (click)="addW(ix)" value="Add W">
+         </div>
+         </div>
+         </div>
+         <input type="button" (click)="addX()" value="Add X">
+         </div>
+         <form>
+                  -->
+                  <h5>Field Values</h5>
+                  <pre style="font-size:15px">
+                      {{ form.value | json }}
+                      </pre>

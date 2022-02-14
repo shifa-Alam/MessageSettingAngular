@@ -1,6 +1,6 @@
 import { HttpEventType } from '@angular/common/http';
 import { AfterContentChecked, ChangeDetectorRef, Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { FormGroup, FormBuilder, FormArray, FormControl } from '@angular/forms';
+import { FormGroup, FormBuilder, FormArray, FormControl, Validators } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { Contact } from 'src/app/models/contact';
 import { User } from 'src/app/models/user';
@@ -12,78 +12,153 @@ import { ContactService } from 'src/app/services/contact.service';
   styleUrls: ['./rnd.component.scss']
 })
 export class RndComponent implements OnInit {
-  data = {
-    companies: [
+  form: any;
+  states = [{ id: 1, name: "state1" }, { id: 2, name: "state2" }];
+  cities = [
+    { stateId: 1, name: "city1a" },
+    { stateId: 1, name: "city1b" },
+    { stateId: 1, name: "city1c" },
+    { stateId: 2, name: "city2a" },
+    { stateId: 2, name: "city2b" },
+    { stateId: 2, name: "city2c" },
+    { stateId: 2, name: "city2d" }
+  ];
+  filteredCities: any[] = [];
+
+  products = [{ id: 1, name: "product1" }, { id: 2, name: "product2" }];
+
+  items = [
+    { productId: 1, name: "item1" },
+    { productId: 1, name: "item2" },
+    { productId: 1, name: "item3" },
+    { productId2: 2, name: "item4" },
+    { productId2: 2, name: "item5" },
+    { productId2: 2, name: "item6" }
+  ];
+
+  filteredItems: any[] = [];
+
+  seedData = {
+    contacts: [
       {
-        company: "example comany",
-        projects: [
+        phoneNo: "0099",
+        name:"Alam",
+        userContacts: [
           {
-            projectName: "example project",
-          }
+            userId:2,
+            userName: "LIton"
+          },
+          {
+            userId:3,
+            userName: "Mizan"
+          },
+        ]
+      },
+      {
+        phoneNo: "8899",
+        name:"Milon",
+        userContacts: [
+          {
+            userId:2,
+            userName: "qq"
+          },
+          {
+            userId:3,
+            userName: "rr"
+          },
         ]
       }
     ]
+  };
+
+  get contactsArray() {
+    return this.form.get("contacts") as FormArray;
+  }
+  getYsArray(index: number) {
+    return this.contactsArray.at(index).get("Ys") as FormArray;
+  }
+  getWsArray(index: number) {
+    return this.contactsArray.at(index).get("Ws") as FormArray;
+  }
+  getZsArray(index: any, indexz: number) {
+    return this.getYsArray(index).at(indexz).get("Zs") as FormArray;
   }
 
-  myForm: FormGroup;
-
-  constructor(private fb: FormBuilder) {
-    this.myForm = this.fb.group({
-      companies: this.fb.array([])
+  setXs(el: any = null) {
+    el = el || { X: null }
+    return this.fb.group({
+      X: [el.X, Validators.required],
+      Ys: el.Ys ? this.fb.array(el.Ys.map((x: any) => this.setYs(x))) : this.fb.array([]),
+      Ws: el.Ws ? this.fb.array(el.Ws.map((x: any) => this.setWs(x))) : this.fb.array([])
     })
-
-    this.setCompanies();
   }
-  ngOnInit(): void {
-
+  setYs(el: any = null) {
+    el = el || { product: null }
+    return this.fb.group({
+      product: [el.product, [Validators.required]],
+      Zs: el.Zs ? this.fb.array(el.Zs.map((x: any) => this.setZs(x))) : this.fb.array([])
+    })
   }
-  getControls() {
-    return (this.myForm.get('companies') as FormArray).controls;
+  setWs(el: any = null) {
+    el = el || { state: null, city: null }
+    return this.fb.group({
+      state: [el.state, [Validators.required]],
+      city: [el.city, [Validators.required]]
+    })
   }
-
-  addNewCompany() {
-    let control = this.myForm.controls['companies'] as FormArray;
-    control.push(
-      this.fb.group({
-        company: [''],
-        projects: this.fb.array([])
-      })
-    )
-  }
-
-  deleteCompany(index: number) {
-    let control = <FormArray>this.myForm.controls['companies'];
-    control.removeAt(index)
-  }
-
-  addNewProject(control: any) {
-    control.push(
-      this.fb.group({
-        projectName: ['']
-      }))
-  }
-
-  deleteProject(control: any, index: any) {
-    control.removeAt(index)
-  }
-
-  setCompanies() {
-    let control = <FormArray>this.myForm.get('companies');
-    this.data.companies.forEach(x => {
-      control.push(this.fb.group({
-        company: x.company,
-        projects: this.setProjects(x)
-      }))
+  setZs(el: any = null) {
+    el = el || { Z: null }
+    return this.fb.group({
+      Z: [el.Z, [Validators.required, Validators.pattern("[0-9]{3}")]]
     })
   }
 
-  setProjects(x: any) {
-    let arr = new FormArray([])
-    x.projects.forEach((y: { projectName: any; }) => {
-      arr.push(this.fb.group({
-        projectName: y.projectName
-      }))
-    })
-    return arr;
+  ngOnInit() {
+    this.form = this.fb.group({
+      contacts: this.fb.array(this.seedData.contacts.map(x => this.setXs(x)))
+    });
   }
+
+
+  stateSelected(event: any) {
+    // const selectEl:any = event.target;
+    // console.log(selectEl)
+    // const val = selectEl.options[selectEl.selectedIndex].getAttribute('data-state_id');
+    console.log(event.target.value);
+    this.filteredCities = this.cities.filter(
+      i => i.stateId == event.target.value
+    );
+  }
+
+  productSelected(event: any) {
+    // const selectEl:any = event.target;
+    // console.log(selectEl)
+    // const val = selectEl.options[selectEl.selectedIndex].getAttribute('data-product_id');
+    console.log(event.target.value);
+    this.filteredItems = this.items.filter(
+      i => i.productId == event.target.value
+    );
+  }
+
+  addX() {
+    // this.XsArray.push(this.setXs());
+  }
+
+  addY(ix: any) {
+    this.getYsArray(ix).push(this.setYs());
+  }
+
+  addZ(ix: any, iy: any) {
+    this.getZsArray(ix, iy).push(this.setZs());
+  }
+
+  addW(ix: any) {
+    this.getYsArray(ix).push(this.setWs())
+  }
+
+  removeW(ix: any, iw: number) {
+    this.getWsArray(ix).removeAt(iw)
+  }
+
+  constructor(private fb: FormBuilder) { }
 }
