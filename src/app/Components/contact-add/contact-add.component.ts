@@ -31,12 +31,14 @@ export class ContactAddComponent implements OnInit {
       .subscribe(event => {
         if (event.type === HttpEventType.Response) {
           this.contacts = event.body;
-          this.modifyPrimaryUser();
+          this.modifyContactPrimaryUser();
+
         }
       }, () => {
         this.contacts = [];
       });
   }
+
   loadUsers() {
     this.contactService.getUserAsync()
       .pipe(takeUntil(this.unsubscribe$))
@@ -62,8 +64,6 @@ export class ContactAddComponent implements OnInit {
   }
 
   AddSecondaryUser(user: User, i: number) {
-    console.log(user);
-
     let cu = new ContactUser();
     cu.userId = user.id;
     cu.userName = user.name;
@@ -99,13 +99,14 @@ export class ContactAddComponent implements OnInit {
         this.contacts[i].contactUsers.splice(this.contacts[i].contactUsers.indexOf(primaryUser), 1);
     }
   }
-  modifyPrimaryUser() {
+  modifyContactPrimaryUser() {
     this.contacts.forEach(e => {
       e.contactUsers.forEach(element => {
         if (element.userType == 1) {
+          //update contact primary user
           e.primaryUserId = element.userId;
           e.primaryUserName = element.userName
-        }
+        } 
       });
     });
   }
